@@ -3,4 +3,4 @@
 <h1>Register</h1>
 <img width="1906" height="1051" alt="Screenshot 2025-11-30 222904" src="https://github.com/user-attachments/assets/aac9c562-3277-4fea-9917-52dabec20176" />
 <h1>Dashboard</h1>
-<img width="2999" height="1875" alt="Dashboard" src="https://github.com/user-attachments/assets/36f63ab5-449b-419a-a4b1-4f23545581af" />
+<img width="1905" height="984" alt="Screenshot 2025-11-30 223400" src="https://github.com/user-attachments/assets/2d892095-5bb3-40cc-a818-395668e51e6a" />
