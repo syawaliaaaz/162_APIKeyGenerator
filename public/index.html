@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Key Registration</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ffe6f0; /* pink muda */
+      color: #333;
+    }
+
+    header {
+      background-color: #87cefa; /* biru langit */
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .form-container {
+      max-width: 500px;
+      margin: 30px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .api-key-section {
+      margin-top: 20px;
+    }
+
+    .api-key-section input {
+      width: calc(100% - 110px);
+      display: inline-block;
+    }
+
+    .api-key-section button {
+      width: 100px;
+      background-color: #ff69b4; /* hot pink */
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .api-key-section button:hover {
+      background-color: #ff85c1;
+    }
+
+    .submit-btn {
+      background-color: #87cefa; /* biru langit */
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .submit-btn:hover {
+      background-color: #6bbbe0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #ffe6f0;
+      font-size: 14px;
+    }
+
+    .login-link {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #ff69b4;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .login-link:hover {
+      background-color: #ff85c1;
+    }
+  </style>
+</head>
+<body>
+  <a href="/login.html" class="login-link">Login Admin</a>
+
+  <header>
+    <h1>API Key Registration</h1>
+    <p>Dapatkan akses API Anda dalam hitungan detik</p>
+  </header>
+
+  <div class="form-container">
+    <label for="firstName">Nama Depan</label>
+    <input type="text" id="firstName" placeholder="firstName" />
+
+    <label for="lastName">Nama Belakang</label>
+    <input type="text" id="lastName" placeholder="lastName" />
+
+    <label for="email">Alamat Email</label>
+    <input type="email" id="email" placeholder="name@example.com" />
+
+    <div class="api-key-section">
+      <label for="apiKey">Generated API Key</label>
+      <input type="text" id="apiKey" placeholder="Isi data diatas & klik generate" readonly />
+      <button onclick="generateKey()">Generate</button>
+      <p>Key ini berlaku selama 30 hari.</p>
+    </div>
+
+    <button class="submit-btn" onclick="submitForm()">Simpan & Daftarkan Saya</button>
+  </div>
+
+  <footer>
+    <p>© 2025 by API System. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function generateKey() {
+      const key = 'API-' + Math.random().toString(36).substr(2, 16).toUpperCase();
+      document.getElementById('apiKey').value = key;
+    }
+
+    function submitForm() {
+      alert('Data berhasil dikirim!');
+      // Tambahkan logika kirim ke backend di sini
+    }
+  </script>
+</body>
+</html>

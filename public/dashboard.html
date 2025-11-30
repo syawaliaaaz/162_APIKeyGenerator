@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | API System</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            font-size: 1.2rem;
+        }
+
+        .main-container {
+            margin-top: -40px; /* Efek overlap ke atas */
+        }
+
+        .dashboard-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            background: white;
+            overflow: hidden;
+        }
+
+        .table-custom th {
+            background-color: #f8f9fc;
+            color: #858796;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 15px;
+            border-bottom: 2px solid #e3e6f0;
+        }
+
+        .table-custom td {
+            padding: 15px;
+            vertical-align: middle;
+            color: #5a5c69;
+            font-size: 0.95rem;
+        }
+
+        .api-key-box {
+            background: #f1f3f9;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            color: #4e73df;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: inline-block;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+        .api-key-box:hover {
+            background: #e5e8f1;
+            width: auto;
+            max-width: none;
+            position: absolute;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .status-valid { background-color: #d1fae5; color: #065f46; }
+        .status-invalid { background-color: #fee2e2; color: #991b1b; }
+
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .btn-action:hover { transform: translateY(-2px); }
+        
+        /* Loading Animation */
+        .loading-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body onload="loadDashboard()">
+
+    <!-- 1. Navbar -->
+    <nav class="navbar navbar-dark navbar-custom mb-5">
+        <div class="container">
+            <span class="navbar-brand">
+                <i class="fas fa-shield-alt me-2"></i>Admin Panel
+            </span>
+            <div class="d-flex align-items-center">
+                <span class="text-white-50 me-3 small d-none d-md-block">Administrator</span>
+                <button onclick="logout()" class="btn btn-sm btn-light text-primary fw-bold px-3 shadow-sm">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. Main Content -->
+    <div class="container main-container pb-5">
+        <div class="card dashboard-card position-relative">
+            
+            <!-- Loading Overlay -->
+            <div id="loadingOverlay" class="loading-overlay">
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+
+            <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
+                <h5 class="m-0 font-weight-bold text-primary">Data Pengguna & API Key</h5>
+                <button onclick="loadDashboard()" class="btn btn-primary btn-sm rounded-pill px-3">
+                    <i class="fas fa-sync-alt me-1"></i> Refresh Data
+                </button>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover m-0" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">User Profile</th>
+                                <th style="width: 25%;">Email</th>
+                                <th style="width: 25%;">API Key</th>
+                                <th style="width: 15%;">Status (30 Hari)</th>
+                                <th style="width: 15%; text-align:center;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Data akan masuk kesini via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyMsg" class="text-center py-5" style="display:none;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" width="80" class="mb-3 opacity-50">
+                    <p class="text-muted fw-bold">Belum ada data user ditemukan.</p>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-light py-3 small text-muted">
+                <i class="fas fa-info-circle me-1"></i> API Key otomatis invalid setelah 30 hari sejak pembuatan.
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Logic Script (Sama, hanya disesuaikan ID dan Tampilannya) -->
+    <script>
+        const token = localStorage.getItem('token');
+        if(!token) {
+            window.location.href = 'login.html';
+        }
+
+        async function loadDashboard() {
+            console.log("Memuat data...");
+            const tbody = document.getElementById('tableBody');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const emptyMsg = document.getElementById('emptyMsg');
+            
+            // Tampilkan Loading
+            loadingOverlay.style.display = 'flex';
+            tbody.innerHTML = ''; 
+            emptyMsg.style.display = 'none';
+
+            try {
+                const res = await fetch('http://localhost:3000/api/admin/dashboard', {
+                    headers: { 
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if(res.status === 401 || res.status === 403) {
+                    logout(); return;
+                }
+
+                const data = await res.json();
+                
+                // Sembunyikan Loading
+                loadingOverlay.style.display = 'none';
+
+                if (data.length === 0) {
+                    emptyMsg.style.display = 'block';
+                    return;
+                }
+
+                data.forEach(item => {
+                    // Logic Status Warna
+                    const isInvalid = item.calculatedStatus === 'Invalid';
+                    const badgeClass = isInvalid ? 'status-invalid' : 'status-valid';
+                    const statusIcon = isInvalid ? 'fa-times-circle' : 'fa-check-circle';
+                    
+                    // Logic Tombol Toggle (Aktif/Nonaktif)
+                    const isActive = item.statusDB === 'active';
+                    const toggleBtnClass = isActive ? 'btn-outline-warning' : 'btn-success';
+                    const toggleIcon = isActive ? 'fa-pause' : 'fa-play';
+                    const toggleTitle = isActive ? 'Nonaktifkan Key' : 'Aktifkan Key';
+
+                    // Format Tanggal Cantik
+                    const dateObj = new Date(item.createdAt);
+                    const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const timeStr = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                    // Handle Unknown User (Jaga-jaga)
+                    const userName = item.User ? `${item.User.firstName} ${item.User.lastName}` : 'Unknown User';
+                    const userEmail = item.User ? item.User.email : 'No Email';
+                    const avatarLetter = userName.charAt(0).toUpperCase();
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 35px; height: 35px; font-weight:bold;">
+                                        ${avatarLetter}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">${userName}</div>
+                                        <small class="text-muted" style="font-size: 0.75rem;">Join: ${dateStr}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${userEmail}</td>
+                            <td style="position:relative;">
+                                <div class="api-key-box shadow-sm" title="Hover untuk lihat full">${item.key_string}</div>
+                            </td>
+                            <td>
+                                <span class="status-badge ${badgeClass}">
+                                    <i class="fas ${statusIcon} me-1"></i> ${item.calculatedStatus}
+                                </span>
+                                <div class="small text-muted mt-1 ms-2" style="font-size:0.7rem;">Umur: ${item.daysOld} hari</div>
+                            </td>
+                            <td class="text-center">
+                                <button onclick="toggleStatus(${item.id})" class="btn btn-action ${toggleBtnClass} me-1" title="${toggleTitle}">
+                                    <i class="fas ${toggleIcon}"></i>
+                                </button>
+                                <button onclick="deleteKey(${item.id})" class="btn btn-action btn-outline-danger" title="Hapus Permanen">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Error Dashboard:", error);
+                loadingOverlay.style.display = 'none';
+                alert('Gagal mengambil data dari server.');
+            }
+        }
+
+        async function toggleStatus(id) {
+            // Efek optimis UI (langsung reload biar cepat)
+            await fetch(`http://localhost:3000/api/admin/key/${id}/toggle`, {
+                method: 'PUT',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            loadDashboard();
+        }
+
+        async function deleteKey(id) {
+            if(confirm('Apakah Anda yakin ingin menghapus data ini secara permanen?')) {
+                await fetch(`http://localhost:3000/api/admin/key/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                loadDashboard();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>
